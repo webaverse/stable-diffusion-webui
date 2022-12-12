@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/digitalwitches/gradio/gradio/networking.py", line 122, in start_server
+    s.bind((LOCALHOST_NAME, server_port))
+OSError: [Errno 98] Address already in use
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/digitalwitches/stable-diffusion-webui/webui.py", line 194, in <module>
+    webui()
+  File "/home/digitalwitches/stable-diffusion-webui/webui.py", line 140, in webui
+    app, local_url, share_url = shared.demo.launch(
+  File "/home/digitalwitches/gradio/gradio/blocks.py", line 1347, in launch
+    server_name, server_port, local_url, app, server = networking.start_server(
+  File "/home/digitalwitches/gradio/gradio/networking.py", line 125, in start_server
+    raise OSError(
+OSError: Port 80 is in use. If a gradio.Blocks is running on the port, you can close() it or gradio.close_all().

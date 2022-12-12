@@ -1,0 +1,8 @@
+No module 'xformers'. Proceeding without it.
+LatentDiffusion: Running in eps-prediction mode
+DiffusionWrapper has 859.52 M params.
+Loading weights [6569e224] from /home/digitalwitches/stable-diffusion-webui/models/Stable-diffusion/Anything-V3.0.ckpt
+Applying cross attention optimization (Doggettx).
+Model loaded.
+Loaded a total of 0 textual inversion embeddings.
+Embeddings: 

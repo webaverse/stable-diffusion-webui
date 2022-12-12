@@ -5,7 +5,7 @@ fairscale==0.4.4
 fonts
 font-roboto
 gfpgan
-gradio==3.9
+gradio==3.11
 invisible-watermark
 numpy
 omegaconf
@@ -30,3 +30,4 @@ inflection
 GitPython
 torchsde
 safetensors
+fastapi
