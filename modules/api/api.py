@@ -322,10 +322,8 @@ class Api:
     def get_sd_models(self):
         return [{"title":x.title, "model_name":x.model_name, "hash":x.hash, "filename": x.filename, "config": x.config} for x in checkpoints_list.values()]
 
-    def set_sd_models(self, req: LoadModelRequest):
-        name = req.name
-
-        info = get_closet_checkpoint_match(name)
+    def set_sd_models(self, model_name):
+        info = get_closet_checkpoint_match(model_name)
         if info is None:
             raise HTTPException(status_code=404, detail="Checkpoint not found")
 
