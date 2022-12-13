@@ -20,7 +20,7 @@ from modules.realesrgan_model import get_realesrgan_models
 from typing import List
 
 from functools import lru_cache
-from modules.sd_models import load_model_weights
+from modules.sd_models import load_model_weights, checkpoints_list, get_closet_checkpoint_match, reload_model_weights
 
 def upscaler_to_index(name: str):
     try:
@@ -100,6 +100,7 @@ class Api:
         self.add_api_route("/sdapi/v1/artist-categories", self.get_artists_categories, methods=["GET"], response_model=List[str])
         self.add_api_route("/sdapi/v1/artists", self.get_artists, methods=["GET"], response_model=List[ArtistItem])
 
+    # test!!
     @lru_cache()
     def load_sd_models_lru():
         list_sd_models = modules.sd_models.checkpoint_tiles()
@@ -124,6 +125,7 @@ class Api:
         raise HTTPException(status_code=401, detail="Incorrect username or password", headers={"WWW-Authenticate": "Basic"})
 
     def text2imgapi(self, txt2imgreq: StableDiffusionTxt2ImgProcessingAPI):#, model = Depends(load_sd_models)):
+        set_sd_models(txt2imgreq.model_name)
         populate = txt2imgreq.copy(update={ # Override __init__ params
             "sd_model": shared.sd_model,
             # "sd_model": model[shared.sd_model],
@@ -149,6 +151,7 @@ class Api:
         return TextToImageResponse(images=b64images, parameters=vars(txt2imgreq), info=processed.js())
 
     def img2imgapi(self, img2imgreq: StableDiffusionImg2ImgProcessingAPI):
+        set_sd_models(img2imgreq.model_name)
         init_images = img2imgreq.init_images
         if init_images is None:
             raise HTTPException(status_code=404, detail="Init image not found")
@@ -318,6 +321,22 @@ class Api:
 
     def get_sd_models(self):
         return [{"title":x.title, "model_name":x.model_name, "hash":x.hash, "filename": x.filename, "config": x.config} for x in checkpoints_list.values()]
+
+    def set_sd_models(self, req: LoadModelRequest):
+        name = req.name
+
+        info = get_closet_checkpoint_match(name)
+        if info is None:
+            raise HTTPException(status_code=404, detail="Checkpoint not found")
+
+        shared.state.begin()
+
+        with self.queue_lock:
+            reload_model_weights(shared.sd_model, info)
+
+        shared.state.end()
+
+        return "loaded"
 
     def get_hypernetworks(self):
         return [{"name": name, "path": shared.hypernetworks[name]} for name in shared.hypernetworks]

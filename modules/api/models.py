@@ -240,3 +240,6 @@ class ArtistItem(BaseModel):
     score: float = Field(title="Score")
     category: str = Field(title="Category")
 
+class LoadModelRequest(BaseModel):
+    name: str = Field(title="Name", description="The name of the checkpoint")
+
