@@ -22,6 +22,9 @@ import modules.images as images
 import modules.styles
 import logging
 
+import modules.sd_models as sd_models
+import modules.sd_vae as sd_vae
+
 
 # some of those options should not be changed at all because they would break the model, so I removed them from options.
 opt_C = 4
@@ -424,8 +427,12 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
 
     try:
         for k, v in p.override_settings.items():
-            setattr(opts, k, v)  # we don't call onchange for simplicity which makes changing model impossible
-            if k == 'sd_hypernetwork': shared.reload_hypernetworks()  # make onchange call for changing hypernet since it is relatively fast to load on-change, while SD models are not
+            #setattr(opts, k, v)  # we don't call onchange for simplicity which makes changing model impossible
+            #if k == 'sd_hypernetwork': shared.reload_hypernetworks()  # make onchange call for changing hypernet since it is relatively fast to load on-change, while SD models are not
+            setattr(opts, k, v)
+            if k == 'sd_hypernetwork': shared.reload_hypernetworks()  # make onchange call for changing hypernet
+            if k == 'sd_model_checkpoint': sd_models.reload_model_weights()  # make onchange call for changing SD model
+            if k == 'sd_vae': sd_vae.reload_vae_weights()  # make onchange call for changing VAE
 
         res = process_images_inner(p)
 
@@ -433,6 +440,8 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
         for k, v in stored_opts.items():
             setattr(opts, k, v)
             if k == 'sd_hypernetwork': shared.reload_hypernetworks()
+            if k == 'sd_model_checkpoint': sd_models.reload_model_weights()
+            if k == 'sd_vae': sd_vae.reload_vae_weights()
 
     return res
 
