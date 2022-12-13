@@ -19,6 +19,9 @@ from modules.sd_models import checkpoints_list
 from modules.realesrgan_model import get_realesrgan_models
 from typing import List
 
+from functools import lru_cache
+from modules.sd_models import load_model_weights
+
 def upscaler_to_index(name: str):
     try:
         return [x.name.lower() for x in shared.sd_upscalers].index(name.lower())
@@ -97,6 +100,17 @@ class Api:
         self.add_api_route("/sdapi/v1/artist-categories", self.get_artists_categories, methods=["GET"], response_model=List[str])
         self.add_api_route("/sdapi/v1/artists", self.get_artists, methods=["GET"], response_model=List[ArtistItem])
 
+    @lru_cache()
+    def load_sd_models_lru():
+        list_sd_models = modules.sd_models.checkpoint_tiles()
+
+        loaded_weights = []
+        checkpoint_info = '' # TODO get checkpoints
+        for model in list_sd_models:
+            loaded_weights.append(load_model_weights(model, checkpoint_info))
+
+        return loaded_weights
+
     def add_api_route(self, path: str, endpoint, **kwargs):
         if shared.cmd_opts.api_auth:
             return self.app.add_api_route(path, endpoint, dependencies=[Depends(self.auth)], **kwargs)
@@ -109,9 +123,10 @@ class Api:
 
         raise HTTPException(status_code=401, detail="Incorrect username or password", headers={"WWW-Authenticate": "Basic"})
 
-    def text2imgapi(self, txt2imgreq: StableDiffusionTxt2ImgProcessingAPI):
+    def text2imgapi(self, txt2imgreq: StableDiffusionTxt2ImgProcessingAPI):#, model = Depends(load_sd_models)):
         populate = txt2imgreq.copy(update={ # Override __init__ params
             "sd_model": shared.sd_model,
+            # "sd_model": model[shared.sd_model],
             "sampler_name": validate_sampler_name(txt2imgreq.sampler_name or txt2imgreq.sampler_index),
             "do_not_save_samples": True,
             "do_not_save_grid": True
