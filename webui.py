@@ -100,7 +100,7 @@ def setup_cors(app):
 def create_api(app):
     from modules.api.api import Api
     api = Api(app, queue_lock)
-    api.load_sd_models_lru()
+    # api.load_sd_models_lru()
     return api
 
 

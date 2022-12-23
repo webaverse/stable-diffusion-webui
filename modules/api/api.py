@@ -19,8 +19,6 @@ from modules.sd_models import checkpoints_list
 from modules.realesrgan_model import get_realesrgan_models
 from typing import List
 
-from functools import lru_cache
-from modules.sd_models import load_model_weights, checkpoints_list, get_closet_checkpoint_match, reload_model_weights
 
 def upscaler_to_index(name: str):
     try:
@@ -99,18 +97,6 @@ class Api:
         self.add_api_route("/sdapi/v1/prompt-styles", self.get_promp_styles, methods=["GET"], response_model=List[PromptStyleItem])
         self.add_api_route("/sdapi/v1/artist-categories", self.get_artists_categories, methods=["GET"], response_model=List[str])
         self.add_api_route("/sdapi/v1/artists", self.get_artists, methods=["GET"], response_model=List[ArtistItem])
-
-    # test!!
-    @lru_cache()
-    def load_sd_models_lru():
-        list_sd_models = modules.sd_models.checkpoint_tiles()
-
-        loaded_weights = []
-        checkpoint_info = '' # TODO get checkpoints
-        for model in list_sd_models:
-            loaded_weights.append(load_model_weights(model, checkpoint_info))
-
-        return loaded_weights
 
     def add_api_route(self, path: str, endpoint, **kwargs):
         if shared.cmd_opts.api_auth:
