@@ -284,7 +284,7 @@ def load_model(checkpoint_info=None):
     list_of_ckpt = checkpoint_tiles()
     for ckpt in list_of_ckpt:
         info = select_checkpoint_by_model_info(ckpt)
-        loaded_weights.append(load_model_weights(sd_model, ckpt))
+        loaded_weights.append(load_model_weights(sd_model, info))
     load_model_weights(sd_model, checkpoint_info)
     if shared.cmd_opts.lowvram or shared.cmd_opts.medvram:
         lowvram.setup_for_low_vram(sd_model, shared.cmd_opts.medvram)
