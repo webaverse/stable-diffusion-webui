@@ -128,6 +128,28 @@ def select_checkpoint():
     return checkpoint_info
 
 
+def select_ckpt_by_model_info(model_checkpoint):
+    checkpoint_info = checkpoints_list.get(model_checkpoint, None)
+    if checkpoint_info is not None:
+        return checkpoint_info
+
+    if len(checkpoints_list) == 0:
+        print(f"No checkpoints found. When searching for checkpoints, looked at:", file=sys.stderr)
+        if shared.cmd_opts.ckpt is not None:
+            print(f" - file {os.path.abspath(shared.cmd_opts.ckpt)}", file=sys.stderr)
+        print(f" - directory {model_path}", file=sys.stderr)
+        if shared.cmd_opts.ckpt_dir is not None:
+            print(f" - directory {os.path.abspath(shared.cmd_opts.ckpt_dir)}", file=sys.stderr)
+        print(f"Can't run without a checkpoint. Find and place a .ckpt file into any of those locations. The program will exit.", file=sys.stderr)
+        exit(1)
+
+    checkpoint_info = next(iter(checkpoints_list.values()))
+    if model_checkpoint is not None:
+        print(f"Checkpoint {model_checkpoint} not found; loading fallback {checkpoint_info.title}", file=sys.stderr)
+
+    return checkpoint_info
+
+
 chckpoint_dict_replacements = {
     'cond_stage_model.transformer.embeddings.': 'cond_stage_model.transformer.text_model.embeddings.',
     'cond_stage_model.transformer.encoder.': 'cond_stage_model.transformer.text_model.encoder.',
@@ -258,6 +280,12 @@ def load_model(checkpoint_info=None):
         sd_config.model.params.unet_config.params.use_fp16 = False
 
     sd_model = instantiate_from_config(sd_config.model)
+    # load all ckpt
+    loaded_weights = []
+    list_of_ckpt = checkpoint_tiles()
+    for ckpt in list_of_ckpt:
+        info = select_ckpt_by_model_info(ckpt)
+        loaded_weights.append(load_model_weights(sd_model, info))
     load_model_weights(sd_model, checkpoint_info)
 
     if shared.cmd_opts.lowvram or shared.cmd_opts.medvram:
@@ -274,6 +302,55 @@ def load_model(checkpoint_info=None):
 
     print(f"Model loaded.")
     return sd_model
+
+
+# def load_model_from_api(checkpoint_info=None):
+#     from modules import lowvram, sd_hijack
+#     checkpoint_info = checkpoint_info or select_checkpoint()
+
+#     if checkpoint_info.config != shared.cmd_opts.config:
+#         print(f"Loading config from: {checkpoint_info.config}")
+
+#     if shared.sd_model:
+#         sd_hijack.model_hijack.undo_hijack(shared.sd_model)
+#         shared.sd_model = None
+#         gc.collect()
+#         devices.torch_gc()
+
+#     sd_config = OmegaConf.load(checkpoint_info.config)
+    
+#     if should_hijack_inpainting(checkpoint_info):
+#         # Hardcoded config for now...
+#         sd_config.model.target = "ldm.models.diffusion.ddpm.LatentInpaintDiffusion"
+#         sd_config.model.params.use_ema = False
+#         sd_config.model.params.conditioning_key = "hybrid"
+#         sd_config.model.params.unet_config.params.in_channels = 9
+
+#         # Create a "fake" config with a different name so that we know to unload it when switching models.
+#         checkpoint_info = checkpoint_info._replace(config=checkpoint_info.config.replace(".yaml", "-inpainting.yaml"))
+
+#     do_inpainting_hijack()
+
+#     if shared.cmd_opts.no_half:
+#         sd_config.model.params.unet_config.params.use_fp16 = False
+
+#     sd_model = instantiate_from_config(sd_config.model)
+#     load_model_weights(sd_model, checkpoint_info)
+
+#     if shared.cmd_opts.lowvram or shared.cmd_opts.medvram:
+#         lowvram.setup_for_low_vram(sd_model, shared.cmd_opts.medvram)
+#     else:
+#         sd_model.to(shared.device)
+
+#     sd_hijack.model_hijack.hijack(sd_model)
+
+#     sd_model.eval()
+#     shared.sd_model = sd_model
+
+#     script_callbacks.model_loaded_callback(sd_model)
+
+#     print(f"Model loaded.")
+#     return sd_model
 
 
 def reload_model_weights(sd_model=None, info=None):
