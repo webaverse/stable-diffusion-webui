@@ -535,6 +535,7 @@ if os.path.exists(config_filename):
 
 sd_upscalers = []
 
+sd_models_list = []
 sd_model = None
 
 clip_model = None
