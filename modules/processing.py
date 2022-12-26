@@ -253,7 +253,6 @@ class Processed:
 
     def js(self):
         obj = {
-           # "model_name": self.model_name,
             "prompt": self.all_prompts[0],
             "all_prompts": self.all_prompts,
             "negative_prompt": self.all_negative_prompts[0],
@@ -282,7 +281,6 @@ class Processed:
             "job_timestamp": self.job_timestamp,
             "clip_skip": self.clip_skip,
             "is_using_inpainting_conditioning": self.is_using_inpainting_conditioning,
-            "model_name": self.model_name,
         }
 
         return json.dumps(obj)
