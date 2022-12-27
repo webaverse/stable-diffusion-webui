@@ -16,7 +16,7 @@ def txt2img(prompt: str, negative_prompt: str, use_model: str, prompt_style: str
     if model is not None:
         print(f'Using: {model.sd_checkpoint_info.model_name} from request')
     else:
-        print(f'Using default model: {shared.sd_model.sd_checkpoint_info.model_name}}')
+        print(f'Using default model: {shared.sd_model.sd_checkpoint_info.model_name}')
     p = StableDiffusionProcessingTxt2Img(
         sd_model=model if model is not None else shared.sd_model,
         outpath_samples=opts.outdir_samples or opts.outdir_txt2img_samples,
