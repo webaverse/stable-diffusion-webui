@@ -8,16 +8,10 @@ import modules.processing as processing
 from modules.ui import plaintext_to_html
 
 
-def txt2img(prompt: str, negative_prompt: str, prompt_style: str, prompt_style2: str, steps: int, sampler_index: int, restore_faces: bool, tiling: bool, n_iter: int, batch_size: int, cfg_scale: float, seed: int, subseed: int, subseed_strength: float, seed_resize_from_h: int, seed_resize_from_w: int, seed_enable_extras: bool, height: int, width: int, enable_hr: bool, denoising_strength: float, firstphase_width: int, firstphase_height: int, model_name: str, *args):
-    model = None
-    print(model_name)
-#    for m in shared.sd_models_list:
-#        if m.sd_checkpoint_info.model_name == model_name:
-#            model = m
-#    print(model.sd_checkpoint_info.model_name)
+def txt2img(prompt: str, negative_prompt: str, use_model: str, prompt_style: str, prompt_style2: str, steps: int, sampler_index: int, restore_faces: bool, tiling: bool, n_iter: int, batch_size: int, cfg_scale: float, seed: int, subseed: int, subseed_strength: float, seed_resize_from_h: int, seed_resize_from_w: int, seed_enable_extras: bool, height: int, width: int, enable_hr: bool, denoising_strength: float, firstphase_width: int, firstphase_height: int, *args):
+    print(use_model)
     p = StableDiffusionProcessingTxt2Img(
         sd_model=shared.sd_model,
-        #sd_model=shared.sd_models_list[0],
         outpath_samples=opts.outdir_samples or opts.outdir_txt2img_samples,
         outpath_grids=opts.outdir_grids or opts.outdir_txt2img_grids,
         prompt=prompt,
@@ -42,7 +36,6 @@ def txt2img(prompt: str, negative_prompt: str, prompt_style: str, prompt_style2:
         denoising_strength=denoising_strength if enable_hr else None,
         firstphase_width=firstphase_width if enable_hr else None,
         firstphase_height=firstphase_height if enable_hr else None,
-        model_name=model_name
     )
 
     p.scripts = modules.scripts.scripts_txt2img

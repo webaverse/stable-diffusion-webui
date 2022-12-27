@@ -306,8 +306,8 @@ def load_model(checkpoint_info=None):
 
         print(f"Models loaded.")
         # loaded_model = shared.sd_model
-    loaded_model = shared.sd_models_list[1]
-    shared.sd_model = shared.sd_models_list[1]
+    loaded_model = shared.sd_models_list[0]
+    shared.sd_model = shared.sd_models_list[0]
     print(shared.sd_model.sd_checkpoint_info.model_name)
     return loaded_model
 
