@@ -146,7 +146,7 @@ class StableDiffusionProcessing():
 
         # Add the fake full 1s mask to the first dimension.
         image_conditioning = torch.nn.functional.pad(image_conditioning, (0, 0, 0, 0, 1, 0), value=1.0)
-        image_conditioning = image_conditioning.to(x.dtype)            
+        image_conditioning = image_conditioning.to(x.dtype)
 
         return image_conditioning
 
@@ -179,7 +179,7 @@ class StableDiffusionProcessing():
             source_image * (1.0 - conditioning_mask),
             getattr(self, "inpainting_mask_weight", shared.opts.inpainting_mask_weight)
         )
-        
+
         # Encode the new masked image using first stage of network.
         conditioning_image = self.sd_model.get_first_stage_encoding(self.sd_model.encode_first_stage(conditioning_image))
 

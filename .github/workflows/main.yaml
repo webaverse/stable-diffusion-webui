@@ -1,0 +1,19 @@
+name: update-server
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  deployment:
+    name: 'self-hosted'
+    runs-on: self-hosted
+    steps:
+      - name: Pull
+        working-directory: /home/digitalwitches/stable-diffusion-webui # /home/sdws/stable-diffusion-webui
+        run: git pull
+      - name: Start server
+        run: sudo nohup $(which python) webui.py

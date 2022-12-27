@@ -60,7 +60,10 @@ def initialize():
 
     modules.sd_vae.refresh_vae_list()
     modules.sd_models.load_model()
-    shared.opts.onchange("sd_model_checkpoint", wrap_queued_call(lambda: modules.sd_models.reload_model_weights()))
+    print('Available models:')
+    for m in shared.sd_models_list:
+         print(f'- {m.sd_checkpoint_info.model_name}')
+#    shared.opts.onchange("sd_model_checkpoint", wrap_queued_call(lambda: modules.sd_models.reload_model_weights()))
     shared.opts.onchange("sd_vae", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("sd_vae_as_default", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("sd_hypernetwork", wrap_queued_call(lambda: shared.reload_hypernetworks()))
@@ -124,7 +127,7 @@ def api_only():
 
     modules.script_callbacks.app_started_callback(None, app)
 
-    api.launch(server_name="0.0.0.0" if cmd_opts.listen else "127.0.0.1", port=cmd_opts.port if cmd_opts.port else 7861)
+    api.launch(server_name="0.0.0.0", port=80)
 
 
 def webui():
@@ -139,8 +142,8 @@ def webui():
 
         app, local_url, share_url = shared.demo.launch(
             share=cmd_opts.share,
-            server_name=server_name,
-            server_port=cmd_opts.port,
+            server_name="0.0.0.0",
+            server_port=80,
             ssl_keyfile=cmd_opts.tls_keyfile,
             ssl_certfile=cmd_opts.tls_certfile,
             debug=cmd_opts.gradio_debug,

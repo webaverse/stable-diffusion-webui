@@ -167,7 +167,7 @@ button{
 }
 
 .overflow-hidden, .gr-panel{
-    overflow: visible !important;
+    overflow: auto !important;
 }
 
 #x_type, #y_type{
