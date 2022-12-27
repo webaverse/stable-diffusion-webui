@@ -250,7 +250,6 @@ def load_model_weights(model, checkpoint_info, vae_file="auto"):
 
 def load_model(checkpoint_info=None):
     from modules import lowvram, sd_hijack
-    loaded_model = None
     # load all ckpt
     # loaded_weights = []
     list_of_ckpt = checkpoint_tiles()
@@ -259,6 +258,7 @@ def load_model(checkpoint_info=None):
         # loaded_weights.append(load_model_weights(sd_model, info))
         # checkpoint_info = checkpoint_info or select_checkpoint()
         checkpoint_info = select_checkpoint_by_model_info(ckpt)
+        print(checkpoint_info)
 
         if checkpoint_info.config != shared.cmd_opts.config:
             print(f"Loading config from: {checkpoint_info.config}")
@@ -302,20 +302,23 @@ def load_model(checkpoint_info=None):
         script_callbacks.model_loaded_callback(sd_model)
 
         # sd_model.loaded_models = loaded_weights
+        print(f'Appending {sd_model.sd_checkpoint_info.model_name}')
         shared.sd_models_list.append(sd_model)
 
-        print(f"Models loaded.")
+        #print(f"Model loaded.")
         # loaded_model = shared.sd_model
-    loaded_model = shared.sd_models_list[0]
+    #loaded_model = shared.sd_models_list[0]
     shared.sd_model = shared.sd_models_list[0]
-    print(shared.sd_model.sd_checkpoint_info.model_name)
-    return loaded_model
+    print(f'Using default model: {shared.sd_model.sd_checkpoint_info.model_name}')
+    for m in shared.sd_models_list:
+        print(m.sd_checkpoint_info.model_name)
+    return shared.sd_model
 
 
 def reload_model_weights(sd_model=None, info=None):
     from modules import lowvram, devices, sd_hijack
     checkpoint_info = info or select_checkpoint()
- 
+
     if not sd_model:
         sd_model = shared.sd_model
 
